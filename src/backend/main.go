@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	"go-bookmark-manager/src/backend/handler"
 	"go-bookmark-manager/src/backend/store"
@@ -25,10 +27,10 @@ func main() {
 		port = "8080"
 	}
 
-	// Get allowed origins from environment or default to all
+	// Get allowed origins from environment or default to localhost:3000
 	allowedOrigins := os.Getenv("CORS_ALLOWED_ORIGINS")
 	if allowedOrigins == "" {
-		allowedOrigins = "*"
+		allowedOrigins = "http://localhost:3000"
 	}
 
 	// Setup routes
@@ -105,8 +107,11 @@ func main() {
 		h.HealthCheck(w, r)
 	})
 
+	// Add logging middleware to all routes
+	loggingHandler := withLogging(mux)
+
 	// Add CORS middleware to all routes
-	corsHandler := withCORS(mux, allowedOrigins)
+	corsHandler := withCORS(loggingHandler, allowedOrigins)
 
 	// Create server
 	server := &http.Server{
@@ -128,6 +133,16 @@ func main() {
 	<-quit
 
 	log.Println("Server shutting down")
+
+	// Graceful shutdown
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("Server forced to shutdown: %v", err)
+	}
+
+	log.Println("Server exited")
 }
 
 // getAllowedOrigin returns the allowed origin or default
@@ -163,4 +178,36 @@ func withCORS(next http.Handler, allowedOrigins string) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+// withLogging adds request/response logging middleware
+func withLogging(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
+		// Create a response writer wrapper to capture status code
+		wrapped := &responseWriter{ResponseWriter: w, statusCode: http.StatusOK}
+
+		next.ServeHTTP(wrapped, r)
+
+		log.Printf(
+			"%s %s %d %v",
+			r.Method,
+			r.URL.Path,
+			wrapped.statusCode,
+			time.Since(start),
+		)
+	})
+}
+
+// responseWriter wraps http.ResponseWriter to capture status code
+type responseWriter struct {
+	http.ResponseWriter
+	statusCode int
+}
+
+// WriteHeader captures the status code
+func (rw *responseWriter) WriteHeader(code int) {
+	rw.statusCode = code
+	rw.ResponseWriter.WriteHeader(code)
 }
