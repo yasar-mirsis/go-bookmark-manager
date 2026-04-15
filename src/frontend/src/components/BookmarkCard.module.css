@@ -1,47 +1,48 @@
 .card {
   display: flex;
   flex-direction: column;
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  background-color: var(--color-background-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-md);
+  transition: box-shadow var(--transition-fast),
+              transform var(--transition-fast);
   min-width: 0;
 }
 
 .card:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-lg);
   transform: translateY(-2px);
 }
 
 .cardHeader {
-  margin-bottom: 12px;
+  margin-bottom: var(--spacing-sm);
 }
 
 .title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #333;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
   margin: 0;
   cursor: pointer;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  line-height: 1.4;
+  line-height: var(--line-height-tight);
 }
 
 .cardBody {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
 }
 
 .url {
-  font-size: 0.85rem;
-  color: #666;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -49,10 +50,10 @@
 }
 
 .description {
-  font-size: 0.9rem;
-  color: #555;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
   margin: 0;
-  line-height: 1.5;
+  line-height: var(--line-height-normal);
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -63,86 +64,93 @@
 .tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-xs);
 }
 
 .tagChip {
-  background-color: #e3f2fd;
-  color: #1976d2;
-  border: 1px solid #90caf9;
-  border-radius: 16px;
-  padding: 4px 12px;
-  font-size: 0.75rem;
-  font-weight: 500;
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary-light);
+  border-radius: var(--radius-full);
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
-  border: 1px solid #90caf9;
+  transition: background-color var(--transition-fast),
+              color var(--transition-fast),
+              border-color var(--transition-fast);
 }
 
 .tagChip:hover {
-  background-color: #1976d2;
-  color: #ffffff;
+  background-color: var(--color-primary);
+  color: var(--color-background-white);
+  border-color: var(--color-primary);
 }
 
 .cardFooter {
-  border-top: 1px solid #f0f0f0;
-  padding-top: 12px;
+  border-top: 1px solid var(--color-border-light);
+  padding-top: var(--spacing-sm);
 }
 
 .buttonGroup {
   display: flex;
-  gap: 8px;
+  gap: var(--spacing-xs);
   justify-content: flex-end;
 }
 
 .btn {
-  background-color: #f5f5f5;
-  color: #333;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 6px 12px;
-  font-size: 0.85rem;
-  font-weight: 500;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: background-color var(--transition-fast),
+              border-color var(--transition-fast);
 }
 
 .btn:hover {
-  background-color: #e0e0e0;
-  border-color: #ccc;
+  background-color: var(--color-border);
+  border-color: var(--color-secondary);
 }
 
 .btnDelete {
-  background-color: #ffebee;
-  color: #c62828;
-  border: 1px solid #ef9a9a;
-  border-radius: 4px;
-  padding: 6px 12px;
-  font-size: 0.85rem;
-  font-weight: 500;
+  background-color: var(--color-error-bg);
+  color: var(--color-error);
+  border: 1px solid var(--color-error-bg);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: background-color var(--transition-fast),
+              border-color var(--transition-fast);
 }
 
 .btnDelete:hover {
-  background-color: #ffcdd2;
-  border-color: #ef5350;
+  background-color: var(--color-error);
+  color: var(--color-background-white);
+  border-color: var(--color-error);
 }
 
 .btnView {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid #a5d6a7;
-  border-radius: 4px;
-  padding: 6px 12px;
-  font-size: 0.85rem;
-  font-weight: 500;
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-bg);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: background-color var(--transition-fast),
+              border-color var(--transition-fast);
 }
 
 .btnView:hover {
-  background-color: #c8e6c9;
-  border-color: #66bb6a;
+  background-color: var(--color-success);
+  color: var(--color-background-white);
+  border-color: var(--color-success);
 }
