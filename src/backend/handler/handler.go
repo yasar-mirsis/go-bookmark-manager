@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -53,51 +52,67 @@ func (h *Handler) CreateBookmark(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var bookmarkData struct {
-		URL         string   `json:"url"`
-		Title       string   `json:"title"`
-		Description string   `json:"description"`
-		Tags        []string `json:"tags"`
-	}
-
-	if err := json.NewDecoder(r.Body).Decode(&bookmarkData); err != nil {
+	// First, decode the raw JSON to handle tags as either string or array
+	var rawData map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&rawData); err != nil {
 		writeError(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
 
+	// Extract fields
+	url, _ := rawData["url"].(string)
+	title, _ := rawData["title"].(string)
+	description, _ := rawData["description"].(string)
+
+	// Parse tags - handle both string and array formats
+	var tags []string
+	if tagsVal, ok := rawData["tags"]; ok {
+		switch v := tagsVal.(type) {
+		case string:
+			// Parse comma-separated string
+			if v != "" {
+				parts := strings.Split(v, ",")
+				for _, part := range parts {
+					trimmed := strings.TrimSpace(part)
+					if trimmed != "" {
+						tags = append(tags, trimmed)
+					}
+				}
+			}
+		case []interface{}:
+			// Parse array of strings
+			for _, item := range v {
+				if str, ok := item.(string); ok {
+					trimmed := strings.TrimSpace(str)
+					if trimmed != "" {
+						tags = append(tags, trimmed)
+					}
+				}
+			}
+		}
+	}
+
 	// Validate required fields
-	if bookmarkData.URL == "" {
+	if url == "" {
 		writeError(w, http.StatusBadRequest, "URL is required")
 		return
 	}
 
-	if bookmarkData.Title == "" {
+	if title == "" {
 		writeError(w, http.StatusBadRequest, "Title is required")
 		return
 	}
 
 	// Validate URL format
-	if !strings.HasPrefix(bookmarkData.URL, "http://") && !strings.HasPrefix(bookmarkData.URL, "https://") {
+	if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
 		writeError(w, http.StatusBadRequest, "Invalid URL format. URL must start with http:// or https://")
 		return
-	}
-
-	// Parse tags if provided as comma-separated string
-	tags := bookmarkData.Tags
-	if len(tags) == 0 {
-		// Check if tags were sent as a string
-		// This handles the case where frontend sends tags as comma-separated string
-	} else {
-		// Clean up tags
-		for i, tag := range tags {
-			tags[i] = strings.TrimSpace(tag)
-		}
 	}
 
 	// Generate unique ID
 	id := generateID()
 
-	bookmark := models.NewBookmark(id, bookmarkData.URL, bookmarkData.Title, bookmarkData.Description, tags)
+	bookmark := models.NewBookmark(id, url, title, description, tags)
 
 	if err := h.store.Create(r.Context(), bookmark); err != nil {
 		writeError(w, http.StatusInternalServerError, "Failed to create bookmark")
@@ -195,42 +210,64 @@ func (h *Handler) UpdateBookmark(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var bookmarkData struct {
-		URL         string   `json:"url"`
-		Title       string   `json:"title"`
-		Description string   `json:"description"`
-		Tags        []string `json:"tags"`
-	}
-
-	if err := json.NewDecoder(r.Body).Decode(&bookmarkData); err != nil {
+	// Decode raw JSON to handle tags as either string or array
+	var rawData map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&rawData); err != nil {
 		writeError(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
 
+	// Extract fields
+	url, _ := rawData["url"].(string)
+	title, _ := rawData["title"].(string)
+	description, _ := rawData["description"].(string)
+
+	// Parse tags - handle both string and array formats
+	var tags []string
+	if tagsVal, ok := rawData["tags"]; ok {
+		switch v := tagsVal.(type) {
+		case string:
+			// Parse comma-separated string
+			if v != "" {
+				parts := strings.Split(v, ",")
+				for _, part := range parts {
+					trimmed := strings.TrimSpace(part)
+					if trimmed != "" {
+						tags = append(tags, trimmed)
+					}
+				}
+			}
+		case []interface{}:
+			// Parse array of strings
+			for _, item := range v {
+				if str, ok := item.(string); ok {
+					trimmed := strings.TrimSpace(str)
+					if trimmed != "" {
+						tags = append(tags, trimmed)
+					}
+				}
+			}
+		}
+	}
+
 	// Validate required fields
-	if bookmarkData.URL == "" {
+	if url == "" {
 		writeError(w, http.StatusBadRequest, "URL is required")
 		return
 	}
 
-	if bookmarkData.Title == "" {
+	if title == "" {
 		writeError(w, http.StatusBadRequest, "Title is required")
 		return
 	}
 
 	// Validate URL format
-	if !strings.HasPrefix(bookmarkData.URL, "http://") && !strings.HasPrefix(bookmarkData.URL, "https://") {
+	if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
 		writeError(w, http.StatusBadRequest, "Invalid URL format. URL must start with http:// or https://")
 		return
 	}
 
-	// Clean up tags
-	tags := bookmarkData.Tags
-	for i, tag := range tags {
-		tags[i] = strings.TrimSpace(tag)
-	}
-
-	bookmark := models.NewBookmark(id, bookmarkData.URL, bookmarkData.Title, bookmarkData.Description, tags)
+	bookmark := models.NewBookmark(id, url, title, description, tags)
 
 	if err := h.store.Update(r.Context(), id, bookmark); err != nil {
 		if strings.Contains(err.Error(), "not found") {
@@ -392,7 +429,7 @@ func (h *Handler) HealthCheck(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, map[string]string{
-		"status": "healthy",
+		"status": "ok",
 	})
 }
 
