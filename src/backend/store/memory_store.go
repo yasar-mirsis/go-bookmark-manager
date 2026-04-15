@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 	"sync"
+	"time"
 
 	"go-bookmark-manager/src/backend/models"
 )
@@ -118,7 +119,8 @@ func (s *MemoryStore) Update(ctx context.Context, id string, bookmark *models.Bo
 		return errors.New("bookmark not found")
 	}
 
-	bookmark.UpdatedAt = bookmark.UpdatedAt // Keep timestamp logic consistent
+	// Update the timestamp to reflect when the update occurred
+	bookmark.UpdatedAt = time.Now()
 	s.bookmarks[id] = bookmark
 	return nil
 }
