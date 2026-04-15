@@ -70,6 +70,74 @@ The go-bookmark-manager is a full-stack web application designed for users to sa
 | Prettier | Code formatting |
 
 
+## Running Tests
+
+### Backend Tests
+
+Run all backend tests (unit tests and integration tests):
+
+```bash
+cd src/backend
+go test -v ./...
+```
+
+Run only unit tests:
+
+```bash
+cd src/backend
+go test -v ./store ./handler
+```
+
+Run only integration tests:
+
+```bash
+cd src/backend
+go test -v -run ^Test.* ./integration_test.go ./main.go ./handler/handler.go ./store/memory_store.go ./models/bookmark.go
+```
+
+Or run integration tests as a package:
+
+```bash
+cd src/backend
+go test -v -run TestHealth ./...
+```
+
+Run tests with coverage:
+
+```bash
+cd src/backend
+go test -v -cover ./...
+```
+
+Run tests with race detection:
+
+```bash
+cd src/backend
+go test -v -race ./...
+```
+
+### Integration Test Coverage
+
+The integration tests (`integration_test.go`) cover:
+
+- **Health Check Endpoint**: Verifies `/health` returns `{"status": "ok"}`
+- **Full CRUD Operations**: Create, Read, Update, Delete bookmarks end-to-end
+- **Pagination**: Tests page/pageSize parameters, edge cases (page 0, pageSize 0, beyond total)
+- **Search Functionality**: Search by title, description, and URL
+- **Tag Filtering**: Filter bookmarks by tag, list all tags with counts
+- **Error Scenarios**: Invalid JSON, missing required fields, invalid URL format, 404s, 405s
+- **Concurrent Access**: Tests thread-safety with concurrent bookmark creation
+
+### Test Commands Summary
+
+| Command | Description |
+|---------|-------------|
+| `go test -v ./...` | Run all tests with verbose output |
+| `go test -v -run TestHealth` | Run only health check tests |
+| `go test -v -cover ./...` | Run tests with coverage report |
+| `go test -v -race ./...` | Run tests with race detection |
+| `go test -v -count=1 ./...` | Run tests without caching |
+
 ---
 
 This project is managed by the SDLC Pipeline. Implementation tasks are tracked as GitHub/GitLab issues.
