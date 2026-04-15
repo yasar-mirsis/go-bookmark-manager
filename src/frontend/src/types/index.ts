@@ -38,3 +38,29 @@ export interface HealthCheckResponse {
   status: string
   timestamp: string
 }
+
+export interface BookmarkFormData {
+  url: string
+  title: string
+  description: string
+  tags: string
+}
+
+export interface SearchParams {
+  query: string
+  page: number
+  pageSize: number
+}
+
+export interface TagInfo {
+  name: string
+  count: number
+}
+
+export interface PaginatedResponse<T> {
+  data: T[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+}
